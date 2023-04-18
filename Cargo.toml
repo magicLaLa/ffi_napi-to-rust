@@ -1,0 +1,17 @@
+[package]
+name = "wave_from_tools"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+safer-ffi = { version = "0.0.10", features = ["proc_macros", "alloc"] }
+
+[features]
+generate-headers = ["safer-ffi/headers"]
+
+[lib]
+name = "wave_from_tools"
+crate-type = ["cdylib"]
+bench = false
