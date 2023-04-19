@@ -1,4 +1,4 @@
-use safer_ffi::{prelude::*};
+use safer_ffi::prelude::*;
 
 /* Export a Rust function to the C world. */
 /// Returns f64;
@@ -43,7 +43,6 @@ pub struct TestConfig {
     pub canvas_position: CanvasStartPostion,
 }
 
-
 #[derive_ReprC]
 #[repr(C)]
 #[derive(Debug)]
@@ -51,7 +50,6 @@ pub struct TestInfo {
     pub config: TestConfig,
     pub test_struct: c_slice::Raw<TestStruct>,
 }
-
 
 #[derive_ReprC]
 #[repr(C)]
@@ -61,8 +59,8 @@ pub struct TestStruct {
     pub speed: f64,
     pub name: char_p::Raw,
     pub is_show: bool,
+    pub list: c_slice::Raw<f64>,
 }
-
 
 #[derive_ReprC]
 #[repr(C)]
@@ -71,7 +69,6 @@ pub struct ReturnStruct {
     pub num: f64,
     pub desc: char_p::Box,
 }
-
 
 #[derive_ReprC]
 #[repr(C)]
@@ -86,33 +83,37 @@ pub struct ReturnStructv2 {
 #[ffi_export]
 pub fn process_test_info(test_info: TestInfo) {
     println!("test_info(rust): {test_info:?}");
-    let list = unsafe {
-        test_info.test_struct.as_ref()
-    }.as_slice();
+    let list = unsafe { test_info.test_struct.as_ref() }.as_slice();
     println!("test_info_list(rust): {list:?}");
-    let name = unsafe {
-        list[0].name.as_ref().to_str()
-    };
+    let name = unsafe { list[0].name.as_ref().to_str() };
     println!("name(rust): {name:?}");
 }
 
 /// Returns the Struct -> ReturnStructv2
 #[ffi_export]
 pub fn get_test_struct() -> ReturnStructv2 {
-    ReturnStructv2 { num: 0.2, desc: char_p::new("test_name"), is_show: false }
+    ReturnStructv2 {
+        num: 0.2,
+        desc: char_p::new("test_name"),
+        is_show: false,
+    }
 }
 
 /// handle array parameter
 #[ffi_export]
 pub fn test_array(array: c_slice::Raw<TestStruct>) -> repr_c::Vec<ReturnStruct> {
-    let list = unsafe {
-        array.as_ref()
-    }.as_slice();
+    let list = unsafe { array.as_ref() }.as_slice();
     println!("p(rust): {list:?}");
-    let name = unsafe {
-        list[0].name.as_ref().to_str()
-    };
+    let name = unsafe { list[0].name.as_ref().to_str() };
     println!("name(rust): {name:?}");
+
+    let flatten_list = list
+        .iter()
+        .flat_map(|item| unsafe { item.list.as_ref().as_slice() })
+        .collect::<Vec<&f64>>();
+
+    println!("flatten_list(rust): {flatten_list:?}");
+
     let mut tmp_list = Vec::new();
     for (idx, ele) in list.iter().enumerate() {
         tmp_list.push(ReturnStruct {
@@ -129,7 +130,6 @@ pub fn test_array(array: c_slice::Raw<TestStruct>) -> repr_c::Vec<ReturnStruct> 
 pub fn rust_free_return_struct(array: repr_c::Vec<ReturnStruct>) {
     drop(array)
 }
-
 
 #[cfg(feature = "generate-headers")]
 #[test]

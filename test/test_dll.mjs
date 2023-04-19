@@ -26,6 +26,7 @@ const TestStruct = StructType({
   speed: ref.types.double,
   name: ref.types.CString,
   is_show: ref.types.bool,
+  list: ArrayDoubleList,
 });
 const TestStruct2 = StructType({
   num: ref.types.double,
@@ -74,18 +75,24 @@ console.log("get_string",rustString);
 const returnStructv2 = libm.get_test_struct();
 console.log("get_test_struct", returnStructv2.toObject());
 
-
+const doubleList = new DoubleArray([1.2, -2.5, -63, 456, 7452, 9999]);
+const doubleInsList = new ArrayDoubleList({
+  ptr: doubleList,
+  len: doubleList.length,
+});
 const TestStructItem = new TestStruct({
   gain: 3.0,
   speed: 1.0,
   name: "This is a test",
   is_show: true,
+  list: doubleInsList,
 });
 const TestStructItem2 = new TestStruct({
   gain: 7.0,
   speed: 8.0,
   name: "",
   is_show: false,
+  list: doubleInsList,
 });
 const TestList = new TestArray([TestStructItem, TestStructItem2]);
 const TestInList = new ArrayTestList({
