@@ -101,7 +101,7 @@ pub fn get_test_struct() -> ReturnStructv2 {
 
 /// handle array parameter
 #[ffi_export]
-pub fn test_array(array: c_slice::Raw<TestStruct>) -> repr_c::Vec<ReturnStruct> {
+pub fn test_array(array: c_slice::Raw<TestStruct>) -> Option<repr_c::Vec<ReturnStruct>> {
     let list = unsafe { array.as_ref() }.as_slice();
     println!("p(rust): {list:?}");
     let name = unsafe { list[0].name.as_ref().to_str() };
@@ -127,7 +127,7 @@ pub fn test_array(array: c_slice::Raw<TestStruct>) -> repr_c::Vec<ReturnStruct> 
     }
     // https://stackoverflow.com/questions/72325860/cant-pass-array-from-rust-to-node-ffi
     println!("tmp(rust) is {tmp_list:?}");
-    tmp_list.into()
+    Some(tmp_list.into())
 }
 
 #[ffi_export]
