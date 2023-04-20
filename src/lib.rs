@@ -114,6 +114,10 @@ pub fn test_array(array: c_slice::Raw<TestStruct>) -> repr_c::Vec<ReturnStruct> 
 
     println!("flatten_list(rust): {flatten_list:?}");
 
+    // test i64 as usize to get vec
+    let idx: i64 = 1;
+    println!("flatten_list_to_get(rust): {:?}", flatten_list.get(idx as usize).unwrap());
+
     let mut tmp_list = Vec::new();
     for (idx, ele) in list.iter().enumerate() {
         tmp_list.push(ReturnStruct {
